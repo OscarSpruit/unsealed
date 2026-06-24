@@ -7,3 +7,9 @@
 plugins {
     kotlin("jvm")
 }
+
+dependencies {
+    project(":runtime")
+
+    implementation(libs.ksp.symbol.processing)
+}

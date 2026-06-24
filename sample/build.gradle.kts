@@ -11,4 +11,6 @@ plugins {
 
 dependencies {
     implementation(project(":runtime"))
+
+    ksp(project(":ksp"))
 }
