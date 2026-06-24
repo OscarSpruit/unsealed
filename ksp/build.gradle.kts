@@ -11,5 +11,6 @@ plugins {
 dependencies {
     project(":runtime")
 
+    implementation(libs.kotlinpoet.ksp)
     implementation(libs.ksp.symbol.processing)
 }

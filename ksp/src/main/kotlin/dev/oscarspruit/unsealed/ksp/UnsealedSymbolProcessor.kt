@@ -14,6 +14,15 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STAR
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.ksp.toClassName
+import com.squareup.kotlinpoet.ksp.writeTo
+import kotlin.reflect.KClass
 
 class UnsealedSymbolProcessor(
     private val codeGenerator: CodeGenerator,
@@ -47,25 +56,32 @@ class UnsealedSymbolProcessor(
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             val packageName = classDeclaration.packageName.asString()
-            val className = classDeclaration.simpleName.asString()
-            val registryName = "${className}Registry"
+            val className = classDeclaration.toClassName()
+            val registryName = "${className.simpleName}Registry"
 
-            val file = codeGenerator.createNewFile(
-                dependencies = Dependencies(aggregating = false, classDeclaration.containingFile!!),
-                packageName = packageName,
-                fileName = registryName,
+            val listType = List::class
+                .asClassName()
+                .parameterizedBy(KClass::class.asClassName().parameterizedBy(STAR))
+
+            val implementations = PropertySpec.builder(
+                name = "implementations",
+                type = listType,
             )
+                .initializer("listOf(\n⇥%L⇤)", leaves.joinToString(",\n") { "${it.toClassName()}::class" })
+                .build()
 
-            file.bufferedWriter().use { writer ->
-                writer.write("package $packageName\n\n")
-                writer.write("object $registryName {\n")
-                writer.write("    val implementations = listOf(\n")
-                leaves.forEach { leaf ->
-                    writer.write("        ${leaf.simpleName.asString()}::class,\n")
-                }
-                writer.write("    )\n")
-                writer.write("}\n")
-            }
+            val registry = TypeSpec.objectBuilder(registryName)
+                .addProperty(implementations)
+                .build()
+
+            val file = FileSpec.builder(packageName, registryName)
+                .addType(registry)
+                .build()
+
+            file.writeTo(
+                codeGenerator = codeGenerator,
+                dependencies = Dependencies(false, classDeclaration.containingFile!!),
+            )
         }
     }
 }

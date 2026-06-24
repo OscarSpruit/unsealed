@@ -1,9 +1,11 @@
 [versions]
 jvm-target = "11"
 kotlin = "2.4.0"
+kotlinpoet = "2.3.0"
 ksp = "2.3.9"
 
 [libraries]
+kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version.ref = "kotlinpoet" }
 ksp-symbol-processing = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
 
 [plugins]
