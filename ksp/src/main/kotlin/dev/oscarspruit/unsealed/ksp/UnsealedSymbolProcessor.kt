@@ -20,16 +20,29 @@ class UnsealedSymbolProcessor(
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val leaves = resolver.getSymbolsWithAnnotation("dev.oscarspruit.unsealed.runtime.UnsealedLeaf")
+            .filter { it.validate() }
+            .filterIsInstance<KSClassDeclaration>()
+            .toList()
+
         resolver.getSymbolsWithAnnotation("dev.oscarspruit.unsealed.runtime.UnsealedRoot")
             .filter { it.validate() }
             .filterIsInstance<KSClassDeclaration>()
-            .forEach { it.accept(UnsealedRootVisitor(codeGenerator), Unit) }
+            .forEach { root ->
+                val rootLeaves = leaves.filter { leaf ->
+                    leaf.superTypes.any { superType ->
+                        superType.resolve().declaration.qualifiedName?.asString() == root.qualifiedName?.asString()
+                    }
+                }
+                root.accept(UnsealedRootVisitor(codeGenerator, rootLeaves), Unit)
+            }
 
         return emptyList()
     }
 
     private class UnsealedRootVisitor(
         private val codeGenerator: CodeGenerator,
+        private val leaves: List<KSClassDeclaration>,
     ) : KSVisitorVoid() {
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
@@ -46,7 +59,11 @@ class UnsealedSymbolProcessor(
             file.bufferedWriter().use { writer ->
                 writer.write("package $packageName\n\n")
                 writer.write("object $registryName {\n")
-                writer.write("    // TODO: populate with leaf types\n")
+                writer.write("    val implementations = listOf(\n")
+                leaves.forEach { leaf ->
+                    writer.write("        ${leaf.simpleName.asString()}::class,\n")
+                }
+                writer.write("    )\n")
                 writer.write("}\n")
             }
         }
