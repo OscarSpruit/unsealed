@@ -1,0 +1,6 @@
+public abstract interface annotation class dev/oscarspruit/unsealed/runtime/UnsealedLeaf : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class dev/oscarspruit/unsealed/runtime/UnsealedRoot : java/lang/annotation/Annotation {
+}
+

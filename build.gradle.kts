@@ -5,6 +5,7 @@
  */
 
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 
 plugins {
@@ -43,6 +44,9 @@ subprojects {
             jvmToolchain {
                 languageVersion.set(libs.versions.jvm.target.map(JavaLanguageVersion::of))
             }
+
+            @OptIn(ExperimentalAbiValidation::class)
+            abiValidation()
         }
     }
 }

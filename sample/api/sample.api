@@ -1,0 +1,14 @@
+public abstract interface class dev/oscarspruit/unsealed/sample/SampleLeafOne : dev/oscarspruit/unsealed/sample/SampleRoot {
+}
+
+public abstract interface class dev/oscarspruit/unsealed/sample/SampleLeafTwo : dev/oscarspruit/unsealed/sample/SampleRoot {
+}
+
+public abstract interface class dev/oscarspruit/unsealed/sample/SampleRoot {
+}
+
+public final class dev/oscarspruit/unsealed/sample/SampleRootRegistry {
+	public static final field INSTANCE Ldev/oscarspruit/unsealed/sample/SampleRootRegistry;
+	public final fun getImplementations ()Ljava/util/List;
+}
+
