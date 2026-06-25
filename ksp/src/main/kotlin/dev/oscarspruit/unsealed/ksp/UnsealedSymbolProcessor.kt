@@ -15,6 +15,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STAR
@@ -22,60 +23,66 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.writeTo
+import dev.oscarspruit.unsealed.runtime.UnsealedLeaf
+import dev.oscarspruit.unsealed.runtime.UnsealedLeafProvider
+import dev.oscarspruit.unsealed.runtime.UnsealedRoot
 import kotlin.reflect.KClass
 
-public class UnsealedSymbolProcessor(
+internal class UnsealedSymbolProcessor(
     private val codeGenerator: CodeGenerator,
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val leaves = resolver.getSymbolsWithAnnotation("dev.oscarspruit.unsealed.runtime.UnsealedLeaf")
+        resolver.getSymbolsWithAnnotation(UnsealedLeaf::class.qualifiedName!!)
             .filter { it.validate() }
             .filterIsInstance<KSClassDeclaration>()
-            .toList()
-
-        resolver.getSymbolsWithAnnotation("dev.oscarspruit.unsealed.runtime.UnsealedRoot")
-            .filter { it.validate() }
-            .filterIsInstance<KSClassDeclaration>()
-            .forEach { root ->
-                val rootLeaves = leaves.filter { leaf ->
-                    leaf.superTypes.any { superType ->
-                        superType.resolve().declaration.qualifiedName?.asString() == root.qualifiedName?.asString()
-                    }
-                }
-                root.accept(UnsealedRootVisitor(codeGenerator, rootLeaves), Unit)
+            .forEach {
+                it.accept(UnsealedLeafVisitor(codeGenerator), Unit)
             }
 
         return emptyList()
     }
 
-    private class UnsealedRootVisitor(
+    private class UnsealedLeafVisitor(
         private val codeGenerator: CodeGenerator,
-        private val leaves: List<KSClassDeclaration>,
     ) : KSVisitorVoid() {
 
         override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
             val packageName = classDeclaration.packageName.asString()
             val className = classDeclaration.toClassName()
-            val registryName = "${className.simpleName}Registry"
+            val providerName = "${className.simpleName}_UnsealedProvider"
 
-            val listType = List::class
-                .asClassName()
-                .parameterizedBy(KClass::class.asClassName().parameterizedBy(STAR))
+            val superType = classDeclaration.superTypes.first { typeRef ->
+                typeRef.resolve().declaration.annotations.any { annotation ->
+                    annotation.annotationType.resolve().declaration.qualifiedName?.asString() ==
+                        UnsealedRoot::class.qualifiedName
+                }
+            }.resolve().toClassName()
 
-            val implementations = PropertySpec.builder(
-                name = "implementations",
-                type = listType,
+            val root = PropertySpec.builder(
+                name = "root",
+                type = KClass::class.asClassName().parameterizedBy(STAR),
+                KModifier.OVERRIDE,
             )
-                .initializer("listOf(\n⇥%L⇤)", leaves.joinToString(",\n") { "${it.toClassName()}::class" })
+                .initializer("%T::class", superType)
                 .build()
 
-            val registry = TypeSpec.objectBuilder(registryName)
-                .addProperty(implementations)
+            val leaves = PropertySpec.builder(
+                name = "leaves",
+                type = List::class.asClassName().parameterizedBy(KClass::class.asClassName().parameterizedBy(STAR)),
+                KModifier.OVERRIDE,
+            )
+                .initializer("listOf(%T::class)", className)
                 .build()
 
-            val file = FileSpec.builder(packageName, registryName)
-                .addType(registry)
+            val provider = TypeSpec.objectBuilder(providerName)
+                .addSuperinterface(UnsealedLeafProvider::class.asClassName())
+                .addProperty(root)
+                .addProperty(leaves)
+                .build()
+
+            val file = FileSpec.builder(packageName, providerName)
+                .addType(provider)
                 .build()
 
             file.writeTo(

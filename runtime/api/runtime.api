@@ -1,6 +1,11 @@
 public abstract interface annotation class dev/oscarspruit/unsealed/runtime/UnsealedLeaf : java/lang/annotation/Annotation {
 }
 
+public abstract interface class dev/oscarspruit/unsealed/runtime/UnsealedLeafProvider {
+	public abstract fun getLeaves ()Ljava/util/List;
+	public abstract fun getRoot ()Lkotlin/reflect/KClass;
+}
+
 public abstract interface annotation class dev/oscarspruit/unsealed/runtime/UnsealedRoot : java/lang/annotation/Annotation {
 }
 
