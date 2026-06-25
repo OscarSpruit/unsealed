@@ -14,6 +14,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -52,12 +53,27 @@ internal class UnsealedSymbolProcessor(
             val className = classDeclaration.toClassName()
             val providerName = "${className.simpleName}_UnsealedProvider"
 
-            val superType = classDeclaration.superTypes.first { typeRef ->
-                typeRef.resolve().declaration.annotations.any { annotation ->
-                    annotation.annotationType.resolve().declaration.qualifiedName?.asString() ==
-                        UnsealedRoot::class.qualifiedName
-                }
-            }.resolve().toClassName()
+            writeProviderFile(
+                classDeclaration = classDeclaration,
+                className = className,
+                providerName = providerName,
+                packageName = packageName,
+            )
+
+            writeResourceFile(
+                classDeclaration = classDeclaration,
+                providerQualifiedName = "$packageName.$providerName",
+            )
+        }
+
+        private fun writeProviderFile(
+            classDeclaration: KSClassDeclaration,
+            className: ClassName,
+            providerName: String,
+            packageName: String,
+        ) {
+            val superType = resolveSuperType(classDeclaration)
+                ?: error("No super type annotated with @UnsealedRoot found on ${className.canonicalName}")
 
             val root = PropertySpec.builder(
                 name = "root",
@@ -89,6 +105,32 @@ internal class UnsealedSymbolProcessor(
                 codeGenerator = codeGenerator,
                 dependencies = Dependencies(false, classDeclaration.containingFile!!),
             )
+        }
+
+        private fun resolveSuperType(classDeclaration: KSClassDeclaration): ClassName? {
+            return classDeclaration.superTypes.find { typeRef ->
+                typeRef.resolve().declaration.annotations.any { annotation ->
+                    annotation.annotationType.resolve().declaration.qualifiedName?.asString() ==
+                        UnsealedRoot::class.qualifiedName
+                }
+            }?.resolve()?.toClassName()
+        }
+
+        private fun writeResourceFile(
+            classDeclaration: KSClassDeclaration,
+            providerQualifiedName: String,
+        ) {
+            val resourceFile = codeGenerator.createNewFile(
+                Dependencies(false, classDeclaration.containingFile!!),
+                packageName = "",
+                fileName = "META-INF/services/${UnsealedLeafProvider::class.qualifiedName}",
+                extensionName = "",
+            )
+
+            resourceFile.bufferedWriter().use { writer ->
+                writer.write(providerQualifiedName)
+                writer.newLine()
+            }
         }
     }
 }
