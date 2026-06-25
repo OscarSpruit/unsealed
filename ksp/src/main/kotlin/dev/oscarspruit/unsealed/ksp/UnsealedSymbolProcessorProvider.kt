@@ -10,7 +10,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
-class UnsealedSymbolProcessorProvider : SymbolProcessorProvider {
+public class UnsealedSymbolProcessorProvider : SymbolProcessorProvider {
 
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return UnsealedSymbolProcessor(environment.codeGenerator)

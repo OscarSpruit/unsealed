@@ -47,6 +47,8 @@ subprojects {
 
             @OptIn(ExperimentalAbiValidation::class)
             abiValidation()
+
+            explicitApi()
         }
     }
 }

@@ -7,4 +7,4 @@
 package dev.oscarspruit.unsealed.runtime
 
 @Target(AnnotationTarget.CLASS)
-annotation class UnsealedRoot
+public annotation class UnsealedRoot

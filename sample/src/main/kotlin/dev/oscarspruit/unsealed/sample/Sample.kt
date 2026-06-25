@@ -10,10 +10,10 @@ import dev.oscarspruit.unsealed.runtime.UnsealedLeaf
 import dev.oscarspruit.unsealed.runtime.UnsealedRoot
 
 @UnsealedRoot
-interface SampleRoot
+public interface SampleRoot
 
 @UnsealedLeaf
-interface SampleLeafOne : SampleRoot
+public interface SampleLeafOne : SampleRoot
 
 @UnsealedLeaf
-interface SampleLeafTwo : SampleRoot
+public interface SampleLeafTwo : SampleRoot

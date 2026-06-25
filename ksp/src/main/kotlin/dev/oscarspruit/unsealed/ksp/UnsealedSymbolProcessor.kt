@@ -24,7 +24,7 @@ import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.writeTo
 import kotlin.reflect.KClass
 
-class UnsealedSymbolProcessor(
+public class UnsealedSymbolProcessor(
     private val codeGenerator: CodeGenerator,
 ) : SymbolProcessor {
 
