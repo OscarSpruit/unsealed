@@ -46,7 +46,13 @@ subprojects {
             }
 
             @OptIn(ExperimentalAbiValidation::class)
-            abiValidation()
+            abiValidation {
+                filters {
+                    exclude {
+                        byNames.add("dev.oscarspruit.unsealed.sample.**")
+                    }
+                }
+            }
 
             explicitApi()
         }

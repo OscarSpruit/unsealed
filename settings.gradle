@@ -23,4 +23,7 @@ rootProject.name = "unsealed"
 
 include ':ksp',
         ':runtime',
-        ':sample'
+        ':sample:app',
+        ':sample:feature1',
+        ':sample:feature2',
+        ':sample:core'
