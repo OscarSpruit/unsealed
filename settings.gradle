@@ -21,9 +21,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "unsealed"
 
-include ':ksp',
-        ':runtime',
-        ':sample:app',
-        ':sample:feature1',
-        ':sample:feature2',
-        ':sample:core'
+include ':compiler',
+    ':gradle-plugin',
+    ':ksp',
+    ':runtime',
+    ':sample:app',
+    ':sample:feature1',
+    ':sample:feature2',
+    ':sample:core'
