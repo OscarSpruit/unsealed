@@ -39,7 +39,7 @@ internal class UnsealedIrGenerationExtension(
 
         val rootToLeaves = mutableMapOf<String, MutableList<String>>()
 
-        for (file in files) {
+        files.forEach { file ->
             for (declaration in file.declarations) {
                 if (declaration !is IrClass) continue
                 if (!declaration.hasAnnotation(unsealedLeafId)) continue
@@ -61,7 +61,7 @@ internal class UnsealedIrGenerationExtension(
 
     private fun writeResources(trees: Map<String, List<String>>) {
         val outputDir = File(resourceOutputDir)
-        for ((rootFqn, leaves) in trees) {
+        trees.forEach { (rootFqn, leaves) ->
             val file = File(outputDir, "META-INF/unsealed/$rootFqn")
             file.parentFile.mkdirs()
             file.writeText(

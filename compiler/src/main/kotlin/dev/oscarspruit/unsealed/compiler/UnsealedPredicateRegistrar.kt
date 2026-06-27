@@ -20,7 +20,7 @@ internal class UnsealedPredicateRegistrar(session: FirSession) : FirDeclarationG
         register(PREDICATE)
     }
 
-    private companion object {
+    companion object {
         val PREDICATE = LookupPredicate.create {
             val classId = ClassId(FqName("dev.oscarspruit.unsealed.runtime"), Name.identifier("UnsealedLeaf"))
             annotated(classId.asSingleFqName())
