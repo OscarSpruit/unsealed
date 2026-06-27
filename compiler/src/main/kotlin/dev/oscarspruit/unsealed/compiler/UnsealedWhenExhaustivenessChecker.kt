@@ -48,9 +48,7 @@ internal object UnsealedWhenExhaustivenessChecker : FirExpressionChecker<FirWhen
 
         val missingLeaves = findMissingLeaves(context, expression, allLeaves)
         if (missingLeaves.isNotEmpty()) {
-            // Report diagnostic
-            val missingNames = missingLeaves.joinToString { it.shortClassName.asString() }
-            reporter.reportOn(expression.source, UnsealedDiagnostics.NON_EXHAUSTIVE_WHEN, missingNames, context)
+            reportDiagnostic(context, expression, reporter, missingLeaves)
         }
     }
 
@@ -107,5 +105,22 @@ internal object UnsealedWhenExhaustivenessChecker : FirExpressionChecker<FirWhen
         }
 
         return allLeaves - coveredLeaves
+    }
+
+    private fun reportDiagnostic(
+        context: CheckerContext,
+        expression: FirWhenExpression,
+        reporter: DiagnosticReporter,
+        missingLeaves: Set<ClassId>,
+    ) {
+        val missingNames = missingLeaves.joinToString { "'${it.shortClassName.asString()}'" }
+        val branchWord = if (missingLeaves.size == 1) "branch" else "branches"
+        reporter.reportOn(
+            source = expression.source,
+            factory = UnsealedDiagnostics.NON_EXHAUSTIVE_WHEN,
+            a = missingNames,
+            b = branchWord,
+            context = context,
+        )
     }
 }
