@@ -6,6 +6,7 @@
 
 package dev.oscarspruit.unsealed.compiler
 
+import dev.oscarspruit.unsealed.compiler.Constants.RESOURCE_OUTPUT_DIR_KEY
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
@@ -23,6 +24,9 @@ public class UnsealedCompilerPluginRegistrar : CompilerPluginRegistrar() {
         configuration: CompilerConfiguration
     ) {
         FirExtensionRegistrarAdapter.registerExtension(UnsealedFirExtensionRegistrar())
-        IrGenerationExtension.registerExtension(UnsealedIrGenerationExtension())
+
+        val resourceOutputDir = configuration[RESOURCE_OUTPUT_DIR_KEY]
+            ?: error("Resource output directory not specified")
+        IrGenerationExtension.registerExtension(UnsealedIrGenerationExtension(resourceOutputDir))
     }
 }
