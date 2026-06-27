@@ -7,10 +7,14 @@
 package dev.oscarspruit.unsealed.compiler
 
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
+import java.io.File
 
-internal class UnsealedFirExtensionRegistrar : FirExtensionRegistrar() {
+internal class UnsealedFirExtensionRegistrar(
+    private val classpathEntries: List<File>,
+) : FirExtensionRegistrar() {
 
     override fun ExtensionRegistrarContext.configurePlugin() {
         +::UnsealedFirAdditionalCheckersExtension
+        +UnsealedTreeRegistry.factory(classpathEntries)
     }
 }

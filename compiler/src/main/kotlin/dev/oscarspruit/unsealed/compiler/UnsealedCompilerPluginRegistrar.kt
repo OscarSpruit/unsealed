@@ -8,6 +8,8 @@ package dev.oscarspruit.unsealed.compiler
 
 import dev.oscarspruit.unsealed.compiler.Constants.RESOURCE_OUTPUT_DIR_KEY
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.jvm.config.JvmClasspathRoot
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -23,7 +25,10 @@ public class UnsealedCompilerPluginRegistrar : CompilerPluginRegistrar() {
     override fun ExtensionStorage.registerExtensions(
         configuration: CompilerConfiguration
     ) {
-        FirExtensionRegistrarAdapter.registerExtension(UnsealedFirExtensionRegistrar())
+        val classpathEntries = configuration.getList(CLIConfigurationKeys.CONTENT_ROOTS)
+            .filterIsInstance<JvmClasspathRoot>()
+            .map { it.file }
+        FirExtensionRegistrarAdapter.registerExtension(UnsealedFirExtensionRegistrar(classpathEntries))
 
         val resourceOutputDir = configuration[RESOURCE_OUTPUT_DIR_KEY]
             ?: error("Resource output directory not specified")
