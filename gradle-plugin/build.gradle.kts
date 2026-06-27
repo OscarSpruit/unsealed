@@ -5,7 +5,7 @@
  */
 
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     `java-gradle-plugin`
 }
 

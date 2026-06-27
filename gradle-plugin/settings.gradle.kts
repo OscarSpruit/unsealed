@@ -17,14 +17,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
 
-rootProject.name = "unsealed"
-
-include ':compiler',
-    ':gradle-plugin',
-    ':runtime',
-    ':sample:app',
-    ':sample:feature1',
-    ':sample:feature2',
-    ':sample:core'
+includeBuild("..")
