@@ -23,7 +23,6 @@ rootProject.name = "unsealed"
 
 include ':compiler',
     ':gradle-plugin',
-    ':ksp',
     ':runtime',
     ':sample:app',
     ':sample:feature1',

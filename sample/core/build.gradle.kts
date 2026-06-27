@@ -6,11 +6,8 @@
 
 plugins {
     kotlin("jvm")
-    alias(libs.plugins.ksp)
 }
 
 dependencies {
     implementation(project(":runtime"))
-
-    ksp(project(":ksp"))
 }
