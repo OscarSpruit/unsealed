@@ -27,8 +27,14 @@ public class UnsealedGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-        return kotlinCompilation.target.project.provider {
-            emptyList()
+        val project = kotlinCompilation.target.project
+        val outputDir = project.layout.buildDirectory.dir("generated/unsealed/resources")
+
+        // Include generated resources in the JAR
+        kotlinCompilation.defaultSourceSet.resources.srcDir(outputDir)
+
+        return project.provider {
+            listOf(SubpluginOption("resourceOutputDir", outputDir.get().asFile.absolutePath))
         }
     }
 
