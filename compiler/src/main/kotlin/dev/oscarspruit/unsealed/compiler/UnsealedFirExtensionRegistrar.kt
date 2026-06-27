@@ -15,6 +15,7 @@ internal class UnsealedFirExtensionRegistrar(
 
     override fun ExtensionRegistrarContext.configurePlugin() {
         +::UnsealedFirAdditionalCheckersExtension
+        +::UnsealedPredicateRegistrar
         +UnsealedTreeRegistry.factory(classpathEntries)
     }
 }
