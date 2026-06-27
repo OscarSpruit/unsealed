@@ -6,8 +6,14 @@
 
 package dev.oscarspruit.unsealed.compiler
 
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
+
 // TODO - Move constants to toml file and generate constants with build config
 internal object Constants {
 
     const val PLUGIN_ID = "dev.oscarspruit.unsealed.compiler"
+
+    const val RESOURCE_OUTPUT_DIR = "resourceOutputDir"
+
+    val RESOURCE_OUTPUT_DIR_KEY = CompilerConfigurationKey<String>(RESOURCE_OUTPUT_DIR)
 }
