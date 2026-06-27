@@ -6,6 +6,7 @@
 
 plugins {
     kotlin("jvm")
+    id("dev.oscarspruit.unsealed")
 }
 
 dependencies {
