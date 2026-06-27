@@ -6,7 +6,19 @@
 
 plugins {
     kotlin("jvm")
+    `java-gradle-plugin`
+}
+
+gradlePlugin {
+    plugins {
+        create("unsealedPlugin") {
+            id = "dev.oscarspruit.unsealed"
+            implementationClass = "dev.oscarspruit.unsealed.gradle.plugin.UnsealedGradlePlugin"
+        }
+    }
 }
 
 dependencies {
+    compileOnly(gradleApi())
+    compileOnly(libs.kotlin.gradle.plugin.api)
 }
