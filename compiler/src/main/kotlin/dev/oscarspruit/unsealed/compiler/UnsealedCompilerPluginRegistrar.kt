@@ -31,7 +31,9 @@ public class UnsealedCompilerPluginRegistrar : CompilerPluginRegistrar() {
         FirExtensionRegistrarAdapter.registerExtension(UnsealedFirExtensionRegistrar(classpathEntries))
 
         val resourceOutputDir = configuration[RESOURCE_OUTPUT_DIR_KEY]
-            ?: error("Resource output directory not specified")
-        IrGenerationExtension.registerExtension(UnsealedIrGenerationExtension(resourceOutputDir))
+        // IDEs don't have a resource output directory + IR generation is not relevant for IDEs
+        if (resourceOutputDir != null) {
+            IrGenerationExtension.registerExtension(UnsealedIrGenerationExtension(resourceOutputDir))
+        }
     }
 }
