@@ -18,5 +18,5 @@ publishing {
 }
 
 dependencies {
-    compileOnly(libs.kotlin.compiler.embeddable)
+    compileOnly(libs.kotlin.compiler)
 }
