@@ -5,6 +5,7 @@
 .classpath
 .gradle
 .iml
+.intellijPlatform
 .kotlin/
 .project
 local.properties

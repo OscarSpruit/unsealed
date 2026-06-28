@@ -10,6 +10,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://www.jetbrains.com/intellij-repository/releases")
     }
 }
 
@@ -25,6 +26,7 @@ rootProject.name = "unsealed"
 include(
     ":compiler",
     ":runtime",
+    ":idea-plugin",
     ":sample:app",
     ":sample:feature1",
     ":sample:feature2",
