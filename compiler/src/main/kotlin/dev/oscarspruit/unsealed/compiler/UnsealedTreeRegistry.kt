@@ -6,17 +6,14 @@
 
 package dev.oscarspruit.unsealed.compiler
 
-import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.extensions.FirExtensionSessionComponent
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import java.io.File
 import java.util.jar.JarFile
 
 internal class UnsealedTreeRegistry(
-    session: FirSession,
     private val classpathEntries: List<File>,
-) : FirExtensionSessionComponent(session) {
+) {
 
     private val trees: Map<ClassId, Set<ClassId>> by lazy { loadFromClasspath() }
 
@@ -69,11 +66,5 @@ internal class UnsealedTreeRegistry(
     private fun classIdFromFqn(fqn: String): ClassId {
         val lastDot = fqn.lastIndexOf('.')
         return ClassId(FqName(fqn.substring(0, lastDot)), FqName(fqn.substring(lastDot + 1)), false)
-    }
-
-    companion object {
-        fun factory(classpathEntries: List<File>) = Factory { session ->
-            UnsealedTreeRegistry(session, classpathEntries)
-        }
     }
 }

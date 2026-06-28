@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.fir.expressions.FirTypeOperatorCall
 import org.jetbrains.kotlin.fir.expressions.FirWhenExpression
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.extensions.PluginServicesInitialization
-import org.jetbrains.kotlin.fir.extensions.extensionService
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -28,7 +27,9 @@ import org.jetbrains.kotlin.fir.types.lowerBoundIfFlexible
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 
-internal object UnsealedWhenExhaustivenessChecker : FirExpressionChecker<FirWhenExpression>(MppCheckerKind.Common) {
+internal class UnsealedWhenExhaustivenessChecker(
+    private val treeRegistry: UnsealedTreeRegistry,
+) : FirExpressionChecker<FirWhenExpression>(MppCheckerKind.Common) {
 
     @OptIn(SymbolInternals::class, PluginServicesInitialization::class)
     context(context: CheckerContext, reporter: DiagnosticReporter)
@@ -54,12 +55,7 @@ internal object UnsealedWhenExhaustivenessChecker : FirExpressionChecker<FirWhen
 
     @OptIn(PluginServicesInitialization::class)
     private fun getAllLeaves(context: CheckerContext, classSymbol: FirClassSymbol<*>): Set<ClassId> {
-        val registry = context.session.extensionService
-            .getAllExtensions()
-            .filterIsInstance<UnsealedTreeRegistry>()
-            .firstOrNull() ?: return emptySet()
-
-        val dependencyLeaves = registry.getLeavesForRoot(classSymbol.classId)
+        val dependencyLeaves = treeRegistry.getLeavesForRoot(classSymbol.classId)
 
         val predicateProvider = context.session.predicateBasedProvider
         val currentModuleLeaves = predicateProvider

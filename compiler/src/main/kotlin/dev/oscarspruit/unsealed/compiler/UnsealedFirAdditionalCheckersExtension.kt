@@ -13,9 +13,12 @@ import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtensi
 
 internal class UnsealedFirAdditionalCheckersExtension(
     session: FirSession,
+    treeRegistry: UnsealedTreeRegistry,
 ) : FirAdditionalCheckersExtension(session) {
 
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
-        override val whenExpressionCheckers: Set<FirWhenExpressionChecker> = setOf(UnsealedWhenExhaustivenessChecker)
+        override val whenExpressionCheckers: Set<FirWhenExpressionChecker> = setOf(
+            UnsealedWhenExhaustivenessChecker(treeRegistry)
+        )
     }
 }
