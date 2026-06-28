@@ -30,7 +30,15 @@ public class UnsealedGradlePlugin : KotlinCompilerPluginSupportPlugin {
         val project = kotlinCompilation.target.project
         val outputDir = project.layout.buildDirectory.dir("generated/unsealed/resources")
 
-        // Include generated resources in the JAR
+        val processResourcesTaskName = if (kotlinCompilation.name == "main") {
+            "processResources"
+        } else {
+            "process${kotlinCompilation.name.replaceFirstChar { it.uppercase() }}Resources"
+        }
+        project.tasks.named(processResourcesTaskName).configure {
+            it.dependsOn(kotlinCompilation.compileKotlinTaskName)
+        }
+
         kotlinCompilation.defaultSourceSet.resources.srcDir(outputDir)
 
         return project.provider {
