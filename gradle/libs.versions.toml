@@ -1,6 +1,6 @@
 [versions]
 jetbrains-intellij = "2.6.0"
-jvm-target = "11"
+jvm-target = "21"
 kotlin = "2.4.0"
 ktlint = "1.8.0"
 spotless = "8.7.0"

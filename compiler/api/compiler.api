@@ -5,6 +5,7 @@ public final class dev/oscarspruit/unsealed/compiler/UnsealedBranchAnalysis {
 
 public final class dev/oscarspruit/unsealed/compiler/UnsealedClassIds {
 	public static final field INSTANCE Ldev/oscarspruit/unsealed/compiler/UnsealedClassIds;
+	public final fun classIdFromFqn (Ljava/lang/String;)Lorg/jetbrains/kotlin/name/ClassId;
 	public final fun getUNSEALED_LEAF ()Lorg/jetbrains/kotlin/name/ClassId;
 	public final fun getUNSEALED_ROOT ()Lorg/jetbrains/kotlin/name/ClassId;
 }

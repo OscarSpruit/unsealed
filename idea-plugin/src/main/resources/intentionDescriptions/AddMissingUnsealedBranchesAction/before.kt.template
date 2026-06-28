@@ -1,0 +1,3 @@
+when (animal) {
+    is Dog -> handleDog(animal)
+}

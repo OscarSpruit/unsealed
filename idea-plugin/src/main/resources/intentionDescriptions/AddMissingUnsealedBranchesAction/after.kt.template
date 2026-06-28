@@ -1,0 +1,5 @@
+when (animal) {
+    is Dog -> handleDog(animal)
+    is Cat -> TODO()
+    is Bird -> TODO()
+}

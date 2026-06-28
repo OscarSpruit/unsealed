@@ -7,7 +7,6 @@
 package dev.oscarspruit.unsealed.compiler
 
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
 import java.io.File
 import java.util.jar.JarFile
 
@@ -40,11 +39,11 @@ public class UnsealedTreeRegistry(
                     .filter { it.name.startsWith("META-INF/unsealed/") && !it.isDirectory }
                     .forEach { entry ->
                         val rootFqn = entry.name.removePrefix("META-INF/unsealed/")
-                        val rootClassId = classIdFromFqn(rootFqn)
+                        val rootClassId = UnsealedClassIds.classIdFromFqn(rootFqn) ?: return@forEach
                         val leaves = jarFile.getInputStream(entry).bufferedReader()
                             .readLines()
                             .filter { it.isNotBlank() }
-                            .map { classIdFromFqn(it) }
+                            .mapNotNull { UnsealedClassIds.classIdFromFqn(it) }
                         result.getOrPut(rootClassId) { mutableSetOf() }.addAll(leaves)
                     }
             }
@@ -55,16 +54,11 @@ public class UnsealedTreeRegistry(
         val unsealedDir = File(dir, "META-INF/unsealed")
         if (!unsealedDir.isDirectory) return
         unsealedDir.listFiles()?.forEach { file ->
-            val rootClassId = classIdFromFqn(file.name)
+            val rootClassId = UnsealedClassIds.classIdFromFqn(file.name) ?: return@forEach
             val leaves = file.readLines()
                 .filter { it.isNotBlank() }
-                .map { classIdFromFqn(it) }
+                .mapNotNull { UnsealedClassIds.classIdFromFqn(it) }
             result.getOrPut(rootClassId) { mutableSetOf() }.addAll(leaves)
         }
-    }
-
-    private fun classIdFromFqn(fqn: String): ClassId {
-        val lastDot = fqn.lastIndexOf('.')
-        return ClassId(FqName(fqn.substring(0, lastDot)), FqName(fqn.substring(lastDot + 1)), false)
     }
 }

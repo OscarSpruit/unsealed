@@ -31,6 +31,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate("2026.1.3")
+        bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
     }
 }

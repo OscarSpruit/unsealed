@@ -17,4 +17,10 @@ public object UnsealedClassIds {
     public val UNSEALED_ROOT: ClassId = ClassId(RUNTIME_PACKAGE, Name.identifier("UnsealedRoot"))
 
     public val UNSEALED_LEAF: ClassId = ClassId(RUNTIME_PACKAGE, Name.identifier("UnsealedLeaf"))
+
+    public fun classIdFromFqn(fqn: String): ClassId? {
+        val lastDot = fqn.lastIndexOf('.')
+        if (lastDot < 0) return null
+        return ClassId(FqName(fqn.substring(0, lastDot)), FqName(fqn.substring(lastDot + 1)), false)
+    }
 }
