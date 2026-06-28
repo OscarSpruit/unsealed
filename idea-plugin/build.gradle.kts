@@ -18,6 +18,12 @@ repositories {
 
 intellijPlatform {
     buildSearchableOptions = false
+
+    pluginConfiguration {
+        ideaVersion {
+            sinceBuild = "261"
+        }
+    }
 }
 
 dependencies {
