@@ -15,9 +15,6 @@ import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.hasAnnotation
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import java.io.File
 
 internal class UnsealedIrGenerationExtension(
@@ -34,19 +31,16 @@ internal class UnsealedIrGenerationExtension(
 
     @OptIn(UnsafeDuringIrConstructionAPI::class)
     private fun findTrees(files: List<IrFile>): Map<String, List<String>> {
-        val unsealedLeafId = ClassId(FqName("dev.oscarspruit.unsealed.runtime"), Name.identifier("UnsealedLeaf"))
-        val unsealedRootId = ClassId(FqName("dev.oscarspruit.unsealed.runtime"), Name.identifier("UnsealedRoot"))
-
         val rootToLeaves = mutableMapOf<String, MutableList<String>>()
 
         files.forEach { file ->
             for (declaration in file.declarations) {
                 if (declaration !is IrClass) continue
-                if (!declaration.hasAnnotation(unsealedLeafId)) continue
+                if (!declaration.hasAnnotation(UnsealedClassIds.UNSEALED_LEAF)) continue
 
                 val rootFqn = declaration.superTypes
                     .mapNotNull { it.classOrNull?.owner }
-                    .firstOrNull { it.hasAnnotation(unsealedRootId) }
+                    .firstOrNull { it.hasAnnotation(UnsealedClassIds.UNSEALED_ROOT) }
                     ?.classId
                     ?.asFqNameString() ?: continue
 

@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.types.lowerBoundIfFlexible
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
 
 internal class UnsealedWhenExhaustivenessChecker(
     private val treeRegistry: UnsealedTreeRegistry,
@@ -34,20 +33,17 @@ internal class UnsealedWhenExhaustivenessChecker(
     @OptIn(SymbolInternals::class, PluginServicesInitialization::class)
     context(context: CheckerContext, reporter: DiagnosticReporter)
     override fun check(expression: FirWhenExpression) {
-        val unsealedRootClassId = ClassId(
-            FqName("dev.oscarspruit.unsealed.runtime"),
-            FqName("UnsealedRoot"),
-            isLocal = false,
-        )
         val subjectType = expression.subjectVariable?.returnTypeRef?.coneTypeOrNull
         val classSymbol = subjectType?.lowerBoundIfFlexible()?.toClassSymbol(context.session)
-        val isAnnotated = classSymbol?.annotations?.hasAnnotation(unsealedRootClassId, context.session)
+        val isAnnotated = classSymbol?.annotations?.hasAnnotation(UnsealedClassIds.UNSEALED_ROOT, context.session)
 
         if (isAnnotated != true) return
 
         val allLeaves = getAllLeaves(context, classSymbol)
+        val coveredBranches = getCoveredBranches(context, expression)
+        val hasElseBranch = expression.branches.any { it.condition is FirElseIfTrueCondition }
 
-        val missingLeaves = findMissingLeaves(context, expression, allLeaves)
+        val missingLeaves = UnsealedBranchAnalysis.findMissingBranches(allLeaves, coveredBranches, hasElseBranch)
         if (missingLeaves.isNotEmpty()) {
             reportDiagnostic(context, expression, reporter, missingLeaves)
         }
@@ -71,36 +67,27 @@ internal class UnsealedWhenExhaustivenessChecker(
         return dependencyLeaves + currentModuleLeaves
     }
 
-    private fun findMissingLeaves(
+    private fun getCoveredBranches(
         context: CheckerContext,
         expression: FirWhenExpression,
-        allLeaves: Set<ClassId>,
     ): Set<ClassId> {
-        val coveredLeaves = mutableSetOf<ClassId>()
+        val coveredBranches = mutableSetOf<ClassId>()
 
         expression.branches.forEach { branch ->
-            when (val condition = branch.condition) {
-                is FirElseIfTrueCondition -> {
-                    // Else branch covers everything
-                    return emptySet()
-                }
-
-                is FirTypeOperatorCall -> {
-                    if (condition.operation == FirOperation.IS) {
-                        val checkedType = condition.conversionTypeRef.coneTypeOrNull
-                        val checkedClassId = checkedType
-                            ?.lowerBoundIfFlexible()
-                            ?.toClassSymbol(context.session)
-                            ?.classId
-                        if (checkedClassId != null) {
-                            coveredLeaves.add(checkedClassId)
-                        }
-                    }
+            val condition = branch.condition
+            if (condition is FirTypeOperatorCall && condition.operation == FirOperation.IS) {
+                val checkedType = condition.conversionTypeRef.coneTypeOrNull
+                val checkedClassId = checkedType
+                    ?.lowerBoundIfFlexible()
+                    ?.toClassSymbol(context.session)
+                    ?.classId
+                if (checkedClassId != null) {
+                    coveredBranches.add(checkedClassId)
                 }
             }
         }
 
-        return allLeaves - coveredLeaves
+        return coveredBranches
     }
 
     private fun reportDiagnostic(

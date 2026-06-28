@@ -10,9 +10,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicate.LookupPredicate
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 
 internal class UnsealedPredicateRegistrar(session: FirSession) : FirDeclarationGenerationExtension(session) {
 
@@ -22,8 +19,7 @@ internal class UnsealedPredicateRegistrar(session: FirSession) : FirDeclarationG
 
     companion object {
         val PREDICATE = LookupPredicate.create {
-            val classId = ClassId(FqName("dev.oscarspruit.unsealed.runtime"), Name.identifier("UnsealedLeaf"))
-            annotated(classId.asSingleFqName())
+            annotated(UnsealedClassIds.UNSEALED_LEAF.asSingleFqName())
         }
     }
 }

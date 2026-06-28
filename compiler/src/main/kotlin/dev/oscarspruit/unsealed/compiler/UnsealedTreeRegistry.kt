@@ -11,13 +11,13 @@ import org.jetbrains.kotlin.name.FqName
 import java.io.File
 import java.util.jar.JarFile
 
-internal class UnsealedTreeRegistry(
+public class UnsealedTreeRegistry(
     private val classpathEntries: List<File>,
 ) {
 
     private val trees: Map<ClassId, Set<ClassId>> by lazy { loadFromClasspath() }
 
-    fun getLeavesForRoot(rootClassId: ClassId): Set<ClassId> {
+    public fun getLeavesForRoot(rootClassId: ClassId): Set<ClassId> {
         return trees[rootClassId] ?: emptySet()
     }
 
