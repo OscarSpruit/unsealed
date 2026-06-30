@@ -34,3 +34,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build --quiet
+
+      - name: Gradle plugin tests
+        run: ./gradlew -p gradle-plugin test --quiet
