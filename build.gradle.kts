@@ -22,12 +22,14 @@ spotless {
     }
     kotlin {
         target("**/*.kt")
+        targetExclude("**/build/**")
         ktlint(libs.versions.ktlint.get())
         trimTrailingWhitespace()
         endWithNewline()
     }
     kotlinGradle {
         target("**/*.kts", "*.kts")
+        targetExclude("**/build/**")
         ktlint(libs.versions.ktlint.get())
         trimTrailingWhitespace()
         endWithNewline()

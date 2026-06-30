@@ -18,7 +18,15 @@ gradlePlugin {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+    systemProperty("rootProjectDir", projectDir.parentFile.absolutePath)
+}
+
 dependencies {
     compileOnly(gradleApi())
     compileOnly(libs.kotlin.gradle.plugin.api)
+
+    testImplementation(gradleTestKit())
+    testImplementation(kotlin("test-junit5"))
 }
