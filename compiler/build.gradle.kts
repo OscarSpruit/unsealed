@@ -24,6 +24,8 @@ tasks.test {
 dependencies {
     compileOnly(libs.kotlin.compiler)
 
+    testImplementation(project(":runtime"))
     testImplementation(libs.kotlin.compiler)
+    testImplementation(libs.kctfork)
     testImplementation(kotlin("test-junit5"))
 }

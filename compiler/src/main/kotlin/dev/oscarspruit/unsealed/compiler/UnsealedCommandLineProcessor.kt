@@ -24,6 +24,7 @@ public class UnsealedCommandLineProcessor : CommandLineProcessor {
             optionName = RESOURCE_OUTPUT_DIR,
             valueDescription = "Resource directory for generated classes",
             description = "Output directory for generated resources",
+            required = false,
         ),
     )
 

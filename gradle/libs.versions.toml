@@ -1,11 +1,13 @@
 [versions]
 jetbrains-intellij = "2.6.0"
 jvm-target = "21"
+kctfork = "0.13.0"
 kotlin = "2.4.0"
 ktlint = "1.8.0"
 spotless = "8.7.0"
 
 [libraries]
+kctfork = { group = "dev.zacsweers.kctfork", name = "core", version.ref = "kctfork" }
 kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler", version.ref = "kotlin" }
 kotlin-gradle-plugin-api = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin-api", version.ref = "kotlin" }
 
