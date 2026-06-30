@@ -18,9 +18,22 @@ public object UnsealedClassIds {
 
     public val UNSEALED_LEAF: ClassId = ClassId(RUNTIME_PACKAGE, Name.identifier("UnsealedLeaf"))
 
+    internal fun classIdToResourceName(classId: ClassId): String {
+        val pkg = classId.packageFqName.asString()
+        val cls = classId.relativeClassName.asString().replace('.', '$')
+        return if (pkg.isEmpty()) cls else "$pkg.$cls"
+    }
+
     public fun classIdFromFqn(fqn: String): ClassId? {
-        val lastDot = fqn.lastIndexOf('.')
+        val dollarIndex = fqn.indexOf('$')
+        val lastDot = if (dollarIndex >= 0) {
+            fqn.lastIndexOf('.', dollarIndex)
+        } else {
+            fqn.lastIndexOf('.')
+        }
         if (lastDot < 0) return null
-        return ClassId(FqName(fqn.substring(0, lastDot)), FqName(fqn.substring(lastDot + 1)), false)
+        val pkg = fqn.substring(0, lastDot)
+        val cls = fqn.substring(lastDot + 1).replace('$', '.')
+        return ClassId(FqName(pkg), FqName(cls), false)
     }
 }

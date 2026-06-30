@@ -17,6 +17,13 @@ publishing {
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     compileOnly(libs.kotlin.compiler)
+
+    testImplementation(libs.kotlin.compiler)
+    testImplementation(kotlin("test-junit5"))
 }

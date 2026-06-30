@@ -38,13 +38,14 @@ internal class UnsealedIrGenerationExtension(
                 if (declaration !is IrClass) continue
                 if (!declaration.hasAnnotation(UnsealedClassIds.UNSEALED_LEAF)) continue
 
-                val rootFqn = declaration.superTypes
+                val rootClassId = declaration.superTypes
                     .mapNotNull { it.classOrNull?.owner }
                     .firstOrNull { it.hasAnnotation(UnsealedClassIds.UNSEALED_ROOT) }
-                    ?.classId
-                    ?.asFqNameString() ?: continue
+                    ?.classId ?: continue
+                val rootFqn = UnsealedClassIds.classIdToResourceName(rootClassId)
 
-                val leafFqn = declaration.classId?.asFqNameString() ?: continue
+                val leafClassId = declaration.classId ?: continue
+                val leafFqn = UnsealedClassIds.classIdToResourceName(leafClassId)
 
                 rootToLeaves.getOrPut(rootFqn) { mutableListOf() }.add(leafFqn)
             }
