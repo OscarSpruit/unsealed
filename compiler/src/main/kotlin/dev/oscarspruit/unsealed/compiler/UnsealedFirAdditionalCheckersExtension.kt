@@ -7,6 +7,8 @@
 package dev.oscarspruit.unsealed.compiler
 
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.analysis.checkers.declaration.DeclarationCheckers
+import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirRegularClassChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirWhenExpressionChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
@@ -15,6 +17,12 @@ internal class UnsealedFirAdditionalCheckersExtension(
     session: FirSession,
     treeRegistry: UnsealedTreeRegistry,
 ) : FirAdditionalCheckersExtension(session) {
+
+    override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
+        override val regularClassCheckers: Set<FirRegularClassChecker> = setOf(
+            UnsealedAnnotationUsageChecker()
+        )
+    }
 
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
         override val whenExpressionCheckers: Set<FirWhenExpressionChecker> = setOf(
