@@ -8,6 +8,7 @@ package dev.oscarspruit.unsealed.compiler
 
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
+import java.io.IOException
 import java.util.jar.JarFile
 
 public class UnsealedTreeRegistry(
@@ -33,7 +34,7 @@ public class UnsealedTreeRegistry(
     }
 
     private fun loadFromJar(jar: File, result: MutableMap<ClassId, MutableSet<ClassId>>) {
-        runCatching {
+        try {
             JarFile(jar).use { jarFile ->
                 jarFile.entries().asSequence()
                     .filter { it.name.startsWith("META-INF/unsealed/") && !it.isDirectory }
@@ -47,6 +48,8 @@ public class UnsealedTreeRegistry(
                         result.getOrPut(rootClassId) { mutableSetOf() }.addAll(leaves)
                     }
             }
+        } catch (_: IOException) {
+            // Skip JARs that can't be read (e.g. corrupted, inaccessible)
         }
     }
 
